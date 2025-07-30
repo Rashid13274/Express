@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebSocket Demo</title>
+</head>
+<body>
+  <h1>WebSocket Test Client</h1>
+  
+  <div>
+    <input type="text" id="messageInput" placeholder="Type a message">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+  
+  <div id="output"></div>
+
+  <script>
+    const output = document.getElementById('output');
+    const ws = new WebSocket('ws://localhost:3000');
+
+    // Connection opened
+    ws.addEventListener('open', (event) => {
+      logToScreen('Connected to server');
+    });
+
+    // Listen for messages
+    ws.addEventListener('message', (event) => {
+      const msg = JSON.parse(event.data);
+      logToScreen(`SERVER: ${msg.message}`);
+    });
+
+    // Connection closed
+    ws.addEventListener('close', () => {
+      logToScreen('Disconnected from server');
+    });
+
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const message = input.value.trim();
+      
+      if(message) {
+        ws.send(message);
+        logToScreen(`YOU: ${message}`);
+        input.value = '';
+      }
+    }
+
+    function logToScreen(text) {
+      output.innerHTML += `<div>${text}</div>`;
+    }
+  </script>
+</body>
+</html>
