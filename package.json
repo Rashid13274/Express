@@ -1,9 +1,9 @@
 {
   "name": "express-mongo-crud",
   "version": "1.0.0",
-  "main": "server-1.js",
+  "main": "test.js",
   "scripts": {
-    "start": "node server-1.js"
+    "start": "node test.js"
   },
   "keywords": [],
   "author": "",
