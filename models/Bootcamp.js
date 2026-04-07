@@ -36,6 +36,12 @@ const BootcampSchema = mongoose.Schema({
       default: 'no-photo.jpg'
     },
 
+    roles:{
+      type: String,
+      enum: ['user', 'admin'],
+      default : 'user'
+    },
+
     description: {
       type: String,
       required: [true, 'Please add a description'],
