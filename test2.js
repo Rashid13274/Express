@@ -9,12 +9,15 @@
  *  */ 
 
 const express = require('express');
-const jwt = require('jwt');
+const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
+// const bcrypt = require('bcrypts');
 const bcrypt = require('bcryptjs');
-const ErrorResponse = require('./ErrorResponse');
 
-mongoose.connect(`mongodb://admin:qwerty@localhost:27017/test?authSource=admin`)
+// const ErrorResponse = require('./ErrorResponse');
+const ErrorResponse = require('./utlis/errorResponse');
+
+mongoose.connect(`mongodb://localhost:27017/test`)
 .then(() => console.log(`mongodb is connected`))
 .catch((error) => console.log(`something went during mongodb connection ${error.message}`));
 
@@ -44,7 +47,7 @@ const UserSchema = new mongoose.Schema({
     roles: {
         type: String,
         enum : ['user', 'admin'],
-        default: true
+        default: 'user'
     }
 }, {timestaps: true });
 
@@ -53,8 +56,9 @@ UserSchema.pre('save', async function(next){
     // only hash if password is modified.
     if(!this.isModified('password')) return next();
     try {
-        const salt = bcrypt.gensalt(10);
-        this.password = bcrypt.hash(this.password, salt);
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
     } catch (error) {
         next(error);
     }
@@ -120,7 +124,7 @@ const authenticateToken =  async (req, res, next) =>{
     try {
         // verify the token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = await this.User.findById(decoded.id);
+        req.user = await User.findById(decoded.id);
         next();
     } catch (error) {
     return next(new ErrorResponse('Not authorized to access this route', 401));
@@ -138,34 +142,43 @@ const authorize = (...roles) =>{
     }
 }
 
+app.get('/getme', async(req, res, next) =>{
+    try {
+        res.status(200).json({success: true, message: 'successfully get request executed !!!'});
+    } catch (error) {
+        return next(new ErrorResponse(`something went wrong : error: ${error.message}`, 500 ));
+        
+    }
+})
+
 app.post('/register', async(req, res, next) =>{
     try {
         const user  = await User.create(req.body);
         res.status(201).json({success: true,  data: user});
     } catch (error) {
-        return next(new ErrorResponse('somewent wrong while creating user', 500));
+        return next(new ErrorResponse(`somewent wrong while creating user error: ${error.message}`, 500));
     }
 });
 
-app.post('/sign', authenticateToken, async(req, res, next) =>{
+app.post('/sign', async(req, res, next) =>{
     try {
         const {email , password} = req.body;
     if(!email || !password){
         return next(new ErrorResponse('somewent wrong while siggn ', 500));
     }
-    const user  = await User.findOne({email});
+    const user  = await User.findOne({email}).select('+password');
     if(!user){
         return next(new ErrorResponse('user not found ', 404));
     }
     //  check the correct password entered by user.
-    const isValidPassword = this.user.passwordCompare(password);
+    const isValidPassword = await user.passwordCompare(password);
     if(!isValidPassword){
         return next(new ErrorResponse('invalid password ', 401));
     }
     const token  = user.getJWTtoken();
     res.status(200).json({success:true, token}) 
     } catch (error) {
-        return next(new ErrorResponse('login error ', 500));
+        return next(new ErrorResponse(`login error ${error.message}`, 500));
     }
 });
 
