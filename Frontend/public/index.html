@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-Time Chat</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="sidebar">
+      <div class="user-profile">
+        <div id="user-info"></div>
+        <div id="create-user-form" class="form-section">
+          <h3>Create Profile</h3>
+          <form id="create-user">
+            <input type="text" placeholder="Name" name="name" required>
+            <input type="number" placeholder="Age" name="age" required>
+            <input type="text" placeholder="Nickname" name="nickname" required>
+            <input type="text" placeholder="City" name="city" required>
+            <button type="submit">Create</button>
+          </form>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h3>Online Users</h3>
+        <div id="online-users"></div>
+      </div>
+      
+      <div class="section">
+        <h3>Chat Rooms</h3>
+        <div id="create-room-form">
+          <input type="text" id="room-name" placeholder="New room name">
+          <button id="create-room-btn">Create</button>
+        </div>
+        <div id="rooms-list"></div>
+      </div>
+    </div>
+    
+    <div class="main">
+      <div class="chat-header">
+        <h2 id="current-chat-title">Select a chat</h2>
+        <div id="typing-indicator"></div>
+      </div>
+      
+      <div class="chat-container">
+        <div id="messages-container"></div>
+      </div>
+      
+      <div class="message-input">
+        <textarea id="message-input" placeholder="Type a message..." disabled></textarea>
+        <div class="input-actions">
+          <input type="file" id="file-input" style="display: none">
+          <button id="file-btn">📎</button>
+          <button id="send-btn" disabled>Send</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="right-sidebar">
+      <div class="section">
+        <h3>Search Messages</h3>
+        <input type="text" id="search-input" placeholder="Search...">
+        <div id="search-results"></div>
+      </div>
+      
+      <div class="section">
+        <h3>User Actions</h3>
+        <div id="block-user-form">
+          <select id="block-user-select"></select>
+          <button id="block-user-btn">Block User</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
